@@ -21,6 +21,8 @@ namespace Resistion
 
 		public Form parentForm { get; set; }
 
+		public List<Color> colorsForDemo = new List<Color>();
+
 		private bool mDown = false;
 
 		public imageHandler ih;
@@ -176,6 +178,14 @@ namespace Resistion
 					}
 				}
 
+
+				if(colorsForDemo.Count > 0)
+				{
+					for(int i = 0; i < colorsForDemo.Count; i++)
+					{
+						e.Graphics.FillRectangle(new SolidBrush(colorsForDemo[i]), new Rectangle(new Point(10, 30 * i), new Size(100, 30)));
+					}
+				}
 
 				
 			}

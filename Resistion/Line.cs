@@ -20,6 +20,18 @@ namespace Resistion
 			this.p2 = p2;
 		}
 
+		public int Length()
+		{
+			int ret = 0;
+
+			int lineA = Math.Abs(p1.X - p2.X);
+			int lineB = Math.Abs(p1.Y - p2.Y);
+			
+			ret = (int)Math.Sqrt(Math.Pow(lineA, 2) + Math.Pow(lineB, 2));
+
+			return ret;
+		}
+
 		public Point[] getPoints(int quantity)
 		{
 			quantity = Math.Abs(quantity);

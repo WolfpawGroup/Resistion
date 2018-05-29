@@ -14,6 +14,9 @@ namespace Resistion
 	{
 		Bitmap bmp = null;
 
+		public int tolerance = 30;
+		public int sampleDistance = 10;
+
 		public Form1()
 		{
 			InitializeComponent();
@@ -38,7 +41,7 @@ namespace Resistion
 
 		private void btn_Measure_Click(object sender, EventArgs e)
 		{
-
+			p_Img.colorsForDemo.Clear();
 			rtb_Data.Clear();
 
 			if (bmp != null)
@@ -66,10 +69,18 @@ namespace Resistion
 					lines = Bands.bands_6;
 				}
 
+				int width = sampleDistance;
+
 				p_Img.lines.Clear();
-				p_Img.lines.AddRange(c_Trig.getParallelLines(new Line(p_Img.startPoint, p_Img.endPoint), 20));
-				p_Img.lines.AddRange(c_Trig.getParallelLines(new Line(p_Img.startPoint, p_Img.endPoint), 40));
-				p_Img.lines.AddRange(c_Trig.getParallelLines(new Line(p_Img.startPoint, p_Img.endPoint), 60));
+				p_Img.lines.AddRange(c_Trig.getParallelLines(new Line(p_Img.startPoint, p_Img.endPoint), width));
+
+				width += sampleDistance;
+
+				p_Img.lines.AddRange(c_Trig.getParallelLines(new Line(p_Img.startPoint, p_Img.endPoint), width));
+
+				width += sampleDistance;
+
+				p_Img.lines.AddRange(c_Trig.getParallelLines(new Line(p_Img.startPoint, p_Img.endPoint), width));
 				p_Img.getParallelLines();
 
 				List<Dictionary<Point, Color>> colors = p_Img.measureLine(lines);
@@ -82,13 +93,17 @@ namespace Resistion
 				int i = 0;
 				int delta = 0;
 
-				rollingColorAVG avg = new rollingColorAVG(30, 25);
-				int maxShortBreak = p_Img.Width / 50;
+				rollingColorAVG avg = new rollingColorAVG(30, tolerance);
+				int maxShortBreak = p_Img.lines.Last().Length() / 20;
 				int currentBreakLength = 0;
 
 				List<List<Point>> bandList = new List<List<Point>>();
 
 				List<Point> redPoints = new List<Point>();
+
+				List<List<Color>> colorbands = new List<List<Color>>();
+
+				List<Color> tmp = new List<Color>();
 
 				for(int len = 0; len < maxLength; len++)
 				{
@@ -110,14 +125,7 @@ namespace Resistion
 					{
 						avg.AddAverageOfColors(ca);
 
-						/*
-						 try
-						{
-							redPoints.Add(colors[6].ElementAt(len).Key);
-						}
-						catch (ArgumentOutOfRangeException) { }
-						catch (Exception ex) { Console.WriteLine(ex.ToString()); }
-						*/
+						tmp.Add(c);
 
 						foreach(Dictionary<Point, Color> dict in colors)
 						{
@@ -129,66 +137,45 @@ namespace Resistion
 							catch (Exception ex) { Console.WriteLine(ex.ToString()); }
 						}
 
-						/*rtb_Data.Text += (i + "/" + colors.Count).ToString().PadRight(9) + " | " +
-							c.R.ToString().PadLeft(3, '0') + " " +
-							c.G.ToString().PadLeft(3, '0') + " " +
-							c.B.ToString().PadLeft(3, '0') + " " + "\r\n";*/
+						
 						i++;
 						currentBreakLength = 0;
 					}
 					else
 					{
-						/*
-						currentBreakLength++;
+						
 						
 						if (currentBreakLength >= maxShortBreak)
 						{
-							break;
-						}
-						*/
-						
-					}
-				}
+							len -= currentBreakLength;
 
+							delta++;
+							colorBands.Add(tmp);
 
+							tmp = new List<Color>();
+							avg = new rollingColorAVG(30, tolerance);
 
-				/*
-				foreach(Dictionary<Point, Color> dict in colors)
-				{
-					foreach (KeyValuePair<Point, Color> kvp in dict)
-					{
-						Color c = kvp.Value;
-
-						if (avg.ColorInTolerance(c))
-						{
-							avg.Add(c);
-							redPoints.Add(kvp.Key);
-							rtb_Data.Text += (i + "/" + colors.Count).ToString().PadRight(9) + " | " +
-								c.R.ToString().PadLeft(3, '0') + " " +
-								c.G.ToString().PadLeft(3, '0') + " " +
-								c.B.ToString().PadLeft(3, '0') + " " + "\r\n";
-							i++;
 							currentBreakLength = 0;
 						}
-						else
-						{
-							currentBreakLength++;
-
-							rtb_Data.Text += i + " - " + c.ToArgb().ToString() + " || " + currentBreakLength + " / " + maxShortBreak + "\r\n";
-
-							if (currentBreakLength >= maxShortBreak)
-							{
-								break;
-							}
-						}
-
-
-						//rtb_Data.Text += c.R + ", " + c.G + ", " + c.B + "\r\n";
+						
+						
+						currentBreakLength++;
 					}
 				}
-				*/
+
+				if (tmp.Count > 0) { colorBands.Add(tmp); }
+
+				foreach (List<Color> cols in colorBands)
+				{
+					rollingColorAVG a = new rollingColorAVG(30, tolerance);
+					Color c = a.AddAverageOfColors(cols);
+
+					p_Img.colorsForDemo.Add(c);
+					
+
+				}
+				
 				p_Img.redPoints = redPoints;
-				//p_Img.otherPoints = c_Trig.getPerpendicularLine(p_Img.startPoint, p_Img.endPoint).getPoints(p_Img.ih.calculateVectorSize()).ToList<Point>(); 
 			}
 		}
 
