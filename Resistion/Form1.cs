@@ -14,7 +14,7 @@ namespace Resistion
 	{
 		Bitmap bmp = null;
 
-		public int tolerance = 30;
+		public int tolerance = 120;
 		public int sampleDistance = 10;
 
 		public Form1()
@@ -72,15 +72,14 @@ namespace Resistion
 				int width = sampleDistance;
 
 				p_Img.lines.Clear();
-				p_Img.lines.AddRange(c_Trig.getParallelLines(new Line(p_Img.startPoint, p_Img.endPoint), width));
 
-				width += sampleDistance;
+				for(int smpl = 0; smpl < 5; smpl++)
+				{
+					p_Img.lines.AddRange(c_Trig.getParallelLines(new Line(p_Img.startPoint, p_Img.endPoint), width));
 
-				p_Img.lines.AddRange(c_Trig.getParallelLines(new Line(p_Img.startPoint, p_Img.endPoint), width));
+					width += sampleDistance;
+				} 
 
-				width += sampleDistance;
-
-				p_Img.lines.AddRange(c_Trig.getParallelLines(new Line(p_Img.startPoint, p_Img.endPoint), width));
 				p_Img.getParallelLines();
 
 				List<Dictionary<Point, Color>> colors = p_Img.measureLine(lines);
@@ -94,7 +93,7 @@ namespace Resistion
 				int delta = 0;
 
 				rollingColorAVG avg = new rollingColorAVG(30, tolerance);
-				int maxShortBreak = p_Img.lines.Last().Length() / 20;
+				int maxShortBreak = p_Img.lines.Last().Length() / 25;
 				int currentBreakLength = 0;
 
 				List<List<Point>> bandList = new List<List<Point>>();

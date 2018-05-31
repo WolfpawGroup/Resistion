@@ -97,11 +97,36 @@ namespace Resistion
 			Color avg = getAverage();
 
 			if (avg == Color.FromArgb(0, 0, 0, 0)) { return true; }
-
+			/*
 			if (
 				(c.R > avg.R + Tolerance || c.R < avg.R - Tolerance) ||
 				(c.G > avg.G + Tolerance || c.G < avg.G - Tolerance) ||
 				(c.B > avg.B + Tolerance || c.B < avg.B - Tolerance)
+			)
+			*/
+
+			int max = c.R + c.G + c.B + (int)(c.GetSaturation() + c.GetBrightness() + c.GetHue());
+			int av = avg.R + avg.G + avg.B + (int)(avg.GetSaturation() + avg.GetBrightness() + avg.GetHue());
+			int tol = Tolerance * 6;
+			/*
+			if(
+
+
+				(c.GetHue() < avg.GetHue() - Tolerance || c.GetHue() > avg.GetHue() + Tolerance) &&
+				(c.GetBrightness() < avg.GetBrightness() - Tolerance || c.GetBrightness() > avg.GetBrightness() + Tolerance) ||
+				(
+					(c.R > avg.R + Tolerance || c.R < avg.R - Tolerance) ||
+					(c.G > avg.G + Tolerance || c.G < avg.G - Tolerance) ||
+					(c.B > avg.B + Tolerance || c.B < avg.B - Tolerance)
+				)
+			)
+			*/
+			/*if(max < av - tol || max > av + tol)*/
+			if(
+				((c.R * c.R) > (avg.R * avg.R + Tolerance * Tolerance) || (c.R * c.R) < (avg.R * avg.R - Tolerance * Tolerance))||
+				((c.G * c.G) > (avg.G * avg.G + Tolerance * Tolerance) || (c.G * c.G) < (avg.G * avg.G - Tolerance * Tolerance))||
+				((c.B * c.B) > (avg.B * avg.B + Tolerance * Tolerance) || (c.B * c.B) < (avg.B * avg.B - Tolerance * Tolerance))
+
 			)
 			{
 				return false;
